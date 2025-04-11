@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #0077B6;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            color: #333;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-container span {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2ECC71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Admin Login</h2>
+        <form action="/admin_login" method="POST">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="admin_gah@gmail.com" required>
+
+            <label for="password">Password:</label>
+            <div class="password-container">
+                <input type="password" name="password" id="password" required>
+                <span onclick="togglePassword(this)">👁</span>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        function togglePassword(icon) {
+            const pass = document.getElementById("password");
+            if (pass.type === "password") {
+                pass.type = "text";
+                icon.textContent = "❌";
+            } else {
+                pass.type = "password";
+                icon.textContent = "👁";
+            }
+        }
+    </script>
+</body>
+</html>

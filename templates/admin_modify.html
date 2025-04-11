@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modify Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #0077B6;
+        }
+
+        form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 500px;
+            margin: auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+        }
+
+        .image-preview img {
+            max-width: 100px;
+            margin: 5px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2ECC71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+    <script>
+        function toggleValueInput() {
+            const column = document.getElementById("column").value;
+            const valueDiv = document.getElementById("valueInput");
+            const imageDiv = document.getElementById("imageInput");
+
+            if (column === "image") {
+                valueDiv.style.display = "none";
+                imageDiv.style.display = "block";
+            } else {
+                valueDiv.style.display = "block";
+                imageDiv.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Modify Product</h2>
+
+    <form method="POST" action="/admin_modify" enctype="multipart/form-data">
+        {% if product_name %}
+            <input type="hidden" name="product_name" value="{{ product_name }}">
+            <p><strong>Modifying Product:</strong> {{ product_name }}</p>
+        {% else %}
+            <label>Product Name:</label>
+            <input type="text" name="product_name" required>
+        {% endif %}
+
+        <label>Select Field to Modify:</label>
+        <select name="column" id="column" onchange="toggleValueInput()" required>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+            <option value="description">Description</option>
+            <option value="image">Image</option>
+        </select>
+
+        <div id="valueInput" style="margin-top:10px;">
+            <label>New Value:</label>
+            <textarea name="new_value" rows="4" required></textarea>
+        </div>
+
+        <div id="imageInput" style="display:none;">
+            {% if images %}
+                <label>Existing Images:</label>
+                <div class="image-preview">
+                    {% for img in images %}
+                        <img src="data:image/jpeg;base64,{{ img.image }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <label>Upload New Image:</label>
+            <input type="file" name="image">
+        </div>
+
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

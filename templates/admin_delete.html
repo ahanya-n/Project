@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 60px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #d63031;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #d63031;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h2>Delete a Product</h2>
+    <form method="POST" action="/delete-product">
+        {% if product_name %}
+            <input type="hidden" name="product_name" value="{{ product_name }}">
+            <p><strong>Product to delete:</strong> {{ product_name }}</p>
+        {% else %}
+            <input type="text" name="product_name" placeholder="Enter Product Name" required><br>
+        {% endif %}
+        <button type="submit">Delete Product</button>
+    </form>
+</body>
+</html>

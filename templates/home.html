@@ -1,0 +1,78 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portal Access — Choose Role</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #0077B6, #2ECC71);
+            color: white;
+            padding-top: 80px;
+        }
+
+        h2 {
+            font-size: 30px;
+            margin-bottom: 30px;
+        }
+
+        .role-container {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .role-box {
+            background-color: white;
+            color: #0077B6;
+            border-radius: 10px;
+            padding: 30px;
+            width: 150px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .role-box:hover {
+            transform: scale(1.05);
+            background-color: #f0f0f0;
+        }
+
+        .emoji {
+            font-size: 50px;
+        }
+
+        .label {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome! Please Choose Your Role</h2>
+
+    <div class="role-container">
+        <a href="/admin_login_page">
+            <div class="role-box">
+                <div class="emoji">🛠</div>
+                <div class="label">Admin</div>
+            </div>
+        </a>
+
+        <a href="/user_coming_soon">
+            <div class="role-box">
+                <div class="emoji">👤</div>
+                <div class="label">User</div>
+            </div>
+        </a>
+    </div>
+</body>
+</html>

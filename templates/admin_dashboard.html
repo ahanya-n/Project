@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #0077B6;
+        }
+
+        .shortcut-buttons {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .shortcut-buttons a {
+            background-color: #0077B6;
+            color: white;
+            padding: 12px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .shortcut-buttons a:hover {
+            background-color: #005f8d;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2ECC71;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #0077B6;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .actions form {
+            display: inline;
+        }
+
+        img {
+            max-width: 80px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Admin Dashboard</h2>
+
+    <!-- Shortcut Buttons -->
+    <div class="shortcut-buttons">
+        <a href="/upload-product">Upload Product</a>
+        <a href="/admin_modify">Modify Product</a>
+        <a href="/delete-product">Delete Product</a>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="GET" action="/search_product">
+        <input type="text" name="query" placeholder="Search product by name..." required>
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Results Table -->
+    {% if products %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.id }}</td>
+            <td>
+                {% if product.image %}
+                    <img src="data:image/jpeg;base64,{{ product.image }}">
+                {% else %}
+                    No Image
+                {% endif %}
+            </td>
+            <td>{{ product.name }}</td>
+            <td>₹{{ product.price }}</td>
+            <td>{{ product.description }}</td>
+            <td class="actions">
+                <!-- Modify Form -->
+                <form method="GET" action="/admin_modify">
+                    <input type="hidden" name="product_name" value="{{ product.name }}">
+                    <button type="submit">Modify</button>
+                </form>
+                <!-- Delete Form -->
+                <form method="POST" action="/delete-product">
+                    <input type="hidden" name="product_name" value="{{ product.name }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p style="text-align:center; color: #888;">No products found. Try searching above.</p>
+    {% endif %}
+</body>
+</html>
