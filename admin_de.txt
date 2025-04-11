@@ -1,0 +1,243 @@
+url-https://emocnhuvsjfwhyugadiq.supabase.co
+anon public-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtb2NuaHV2c2pmd2h5dWdhZGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NzU5ODksImV4cCI6MjA1OTQ1MTk4OX0.9RaSAKStvv4x4V1MyIaos92eXu-5FCwN3xJH1BRoyJk
+table name-product_images
+table name-products
+-------------------------------------------------------------
+Samsung Galaxy S24 Ultra 5G AI Smartphone (Titanium Black, 12GB, 256GB Storage)
+90,000
+Brand-Samsung
+Operating System-Android 14
+RAM Memory Installed Size-12 GB
+CPU Model-Snapdragon
+CPU Speed-3.39 GHz
+----------------------------------------------------------
+pip install flask supabase
+pip install supabase
+from flask import Flask, request, render_template, redirect, url_for
+from werkzeug.utils import secure_filename
+from supabase import create_client
+import os
+import re
+import base64
+app = Flask(__name__)
+
+# Homepage - Role selection
+@app.route('/')
+def home():
+    return render_template("home.html")
+
+# Admin Login Page
+@app.route('/admin_login_page')
+def admin_login_page():
+    return render_template("admin_login.html")
+
+# Admin Login Logic
+@app.route('/admin_login', methods=['POST'])
+def admin_login():
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if email == "admin_gah@gmail.com" and password == "Qwert@1234":
+        return redirect(url_for('admin_dashboard'))
+    else:
+        return render_template("error.html", message="✗ Invalid credentials! Please try again.")
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    return render_template("admin_dashboard.html")  # not just a string
+
+@app.route('/search_product')
+def search_product():
+    query = request.args.get('query', '').strip()
+
+    if not query:
+        return render_template("admin_dashboard.html", products=[])
+
+    # Case-insensitive partial search
+    response = supabase.table("products").select("*").ilike("name", f"%{query}%").execute()
+    products = response.data if response.data else []
+    
+    return render_template("admin_dashboard.html", products=products)
+
+@app.route('/upload-product')
+def upload_product():
+    return render_template("admin_upload.html")
+
+@app.route('/admin_modify', methods=['GET', 'POST'])
+def admin_modify():
+    if request.method == 'POST':
+        try:
+            name = request.form.get('product_name')
+            column = request.form.get('column')
+            new_value = request.form.get('new_value')
+
+            # Convert price if it's being updated
+            if column == 'price':
+                new_value = float(re.sub(r"[^\d.]", "", new_value))
+
+            response = supabase.table("products").update({column: new_value}).eq("name", name).execute()
+
+            if response.data:
+                return "✓ Product updated successfully!"
+            else:
+                return "✗ Failed to update product."
+
+        except Exception as e:
+            return f"✗ Error: {e}"
+
+    # GET request
+    product_name = request.args.get('product_name')  # from dashboard URL
+    return render_template("admin_modify.html", product_name=product_name)
+
+@app.route('/delete-product', methods=['GET', 'POST'])
+# def delete_product():
+#     if request.method == 'POST':
+#         try:
+#             name = request.form.get('product_name')
+#             response = supabase.table("products").delete().eq("name", name).execute()
+
+#             if response.data:
+#                 return render_template("success.html", message="✓ Product deleted successfully!")
+#             else:
+#                 return render_template("error.html", message="✗ Product not found or couldn't be deleted.")
+
+#         except Exception as e:
+#             return render_template("error.html", message=f"✗ Error: {e}")
+
+#     # GET request — show the delete form
+#     return render_template("admin_delete.html")
+
+#     @app.route('/delete_product', methods=['GET'])
+# def delete_product_direct():
+#     product_id = request.args.get('id')
+
+#     if not product_id:
+#         return render_template("error.html", message="✗ Product ID is missing.")
+
+#     try:
+#         response = supabase.table("products").delete().eq("id", product_id).execute()
+#         if response.data:
+#             return redirect(url_for('admin_dashboard'))
+#         else:
+#             return render_template("error.html", message="✗ Failed to delete product.")
+#     except Exception as e:
+#         return render_template("error.html", message=f"✗ Error: {e}")
+
+# Admin Upload Page
+@app.route('/admin_upload')
+def admin_upload():
+    return render_template("admin_upload.html")
+
+# User (Coming Soon)
+@app.route('/user_coming_soon')
+def user_coming_soon():
+    return "User section coming soon!"
+
+# Supabase setup
+url = "https://emocnhuvsjfwhyugadiq.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtb2NuaHV2c2pmd2h5dWdhZGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NzU5ODksImV4cCI6MjA1OTQ1MTk4OX0.9RaSAKStvv4x4V1MyIaos92eXu-5FCwN3xJH1BRoyJk"
+supabase = create_client(url, key)
+
+# Upload Products
+@app.route('/upload', methods=['POST'])
+def upload():
+    try:
+        name = request.form.get('product_title')
+        raw_price = request.form.get('price')
+        description = request.form.get('description')
+        images = request.files.getlist('images')
+
+        price = float(re.sub(r"[^\d.]", "", raw_price))
+
+        product_data = {
+            "name": name,
+            "price": price,
+            "description": description
+        }
+
+        product_response = supabase.table("products").insert(product_data).execute()
+        if not product_response.data:
+            return render_template("error.html", message="✗ Failed to insert product!")
+
+        product_id = product_response.data[0]['id']
+
+        for img in images:
+            if img and img.filename:
+                binary_data = img.read()
+                base64_image = base64.b64encode(binary_data).decode('utf-8')
+                image_record = {
+                    "product_id": product_id,
+                    "image": base64_image
+                }
+                supabase.table("product_images").insert(image_record).execute()
+
+        return render_template("success.html", message="✓ Product and images uploaded successfully!")
+
+    except Exception as e:
+        return render_template("error.html", message=f"✗ Error: {e}")
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+
+
+-------------------------------------
+from flask import Blueprint, render_template, request
+from supabase import create_client
+import re
+import base64
+
+admin_modify_bp = Blueprint('admin_modify_bp', __name__)
+
+url = "https://emocnhuvsjfwhyugadiq.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtb2NuaHV2c2pmd2h5dWdhZGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NzU5ODksImV4cCI6MjA1OTQ1MTk4OX0.9RaSAKStvv4x4V1MyIaos92eXu-5FCwN3xJH1BRoyJk"
+supabase = create_client(url, key)
+
+def admin_modify():
+    if request.method == 'POST':
+        # This is when the admin clicks 'Update Product'
+        product_name = request.form.get('product_name')
+        column = request.form.get('column')
+        new_value = request.form.get('new_value')
+
+        if not product_name or not column or not new_value:
+            return render_template("error.html", message="✗ Missing required fields.")
+        
+            if column not in ['name', 'price', 'description']:
+                return render_template("error.html", message="✗ Invalid column selected.")
+
+            # Fetch product ID
+            product_res = supabase.table("products").select("id").eq("name", product_name).execute()
+            if not product_res.data:
+                return render_template("error.html", message="✗ Product not found.")
+            product_id = product_res.data[0]['id']
+
+            if column == 'price':
+                new_value = float(re.sub(r"[^\d.]", "", new_value))
+                if new_value > 99999999.99:
+                    return render_template("error.html", message="✗ Price too high (max ₹99999999.99)")
+
+            # Update column
+            supabase.table("products").update({column: new_value}).eq("id", product_id).execute()
+
+            # If image uploaded, insert it
+            if image_file and image_file.filename:
+                binary_data = image_file.read()
+                base64_image = base64.b64encode(binary_data).decode('utf-8')
+                supabase.table("product_images").insert({
+                    "product_id": product_id,
+                    "image": base64_image
+                }).execute()
+
+            return render_template("success.html", message="✓ Product updated successfully!")
+
+        except Exception as e:
+            return render_template("error.html", message=f"✗ Error: {e}")
+    else:
+        # This handles the GET request when clicking Modify from the dashboard
+        product_name = request.args.get('product_name')
+        return render_template("admin_modify.html", product_name=product_name)
+
+
